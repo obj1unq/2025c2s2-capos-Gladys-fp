@@ -45,7 +45,7 @@ object rolando {
     method buscarArtefacto(artefactoABuscar) {
       return self.cantidadTotalDeArtefactosRecolectados().contains(artefactoABuscar)
     }
-
+///------fin
 }
 
 object castilloDePiedras {
