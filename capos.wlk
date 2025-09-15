@@ -1,14 +1,20 @@
 object rolando {
     var tamañoMochila = 2
-    const depositoCastillo = castilloDePiedras
+    const hogar = castilloDePiedras
+    const historialDeArtefactosEncontrados = [] 
+
+    method historialDeArtefactosEncontrados() {
+      return historialDeArtefactosEncontrados
+    }
 
     method tamañoMochila(_tamañoMochila){
         tamañoMochila = _tamañoMochila
     }
 
-    const artefactosRecolectados = #{espadadeldestino,librodehechizos}
+    const artefactosRecolectados = #{}
     
     method recolectarArtefacto(artefacto){
+        historialDeArtefactosEncontrados.add(artefacto) 
         if(tamañoMochila > artefactosRecolectados.size()){      
             artefactosRecolectados.add(artefacto)  
         }
@@ -19,19 +25,26 @@ object rolando {
     }
 
 
-    method almacenarArtefactosEnCastillo() {
-        depositoCastillo.artefactosRecolectados().addAll(artefactosRecolectados)
+    method almacenarArtefactosEnHogar() {
+        hogar.artefactosRecolectados().addAll(artefactosRecolectados)
         artefactosRecolectados.clear()
     }
 
-    method artefactosRecolectadosEnCastillo() {
-      return depositoCastillo
+    method artefactosRecolectadosEnHogar() {
+      return hogar
     }
 
-    method llegarACastillo() {
-      self.almacenarArtefactosEnCastillo()
+ 
+
+
+    method cantidadTotalDeArtefactosRecolectados() {
+     return self.artefactosRecolectadosPorRolando() + hogar.artefactosRecolectados()
     }
 
+    
+    method buscarArtefacto(artefactoABuscar) {
+      return self.cantidadTotalDeArtefactosRecolectados().contains(artefactoABuscar)
+    }
 
 }
 
