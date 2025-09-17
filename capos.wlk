@@ -1,18 +1,18 @@
 object rolando {
     var tamañoMochila = 2
+    var poderBase = 5
     const hogar = castilloDePiedras
     const historialDeArtefactosEncontrados = [] 
+    const artefactosRecolectados = #{}
+
+    method artefactosRecolectadosPorRolando() {
+      return artefactosRecolectados
+    }    
 
     method historialDeArtefactosEncontrados() {
       return historialDeArtefactosEncontrados
     }
 
-    method tamañoMochila(_tamañoMochila){
-        tamañoMochila = _tamañoMochila
-    }
-
-    const artefactosRecolectados = #{}
-    
     method recolectarArtefacto(artefacto){
         historialDeArtefactosEncontrados.add(artefacto) 
         if(tamañoMochila > artefactosRecolectados.size()){      
@@ -20,34 +20,34 @@ object rolando {
         }
     }
 
-    method artefactosRecolectadosPorRolando() {
-      return artefactosRecolectados
-    }
-
-
-    method almacenarArtefactosEnHogar() {
-        hogar.artefactosRecolectados().addAll(artefactosRecolectados)
+    method esconderArtefactosEnHogar() {
+        hogar.esconderArtefactos(artefactosRecolectados)
         artefactosRecolectados.clear()
     }
 
-    method artefactosRecolectadosEnHogar() {
-      return hogar
-    }
+    method llegarAHogar() { //siempre que llega a su hogar guarda todos los artefactos que tiene.
+    self.esconderArtefactosEnHogar()
+  }
 
- 
-
-
-    method cantidadTotalDeArtefactosRecolectados() {
-     return self.artefactosRecolectadosPorRolando() + hogar.artefactosRecolectados()
-    }
-
-    
     method buscarArtefacto(artefactoABuscar) {
-      return self.cantidadTotalDeArtefactosRecolectados().contains(artefactoABuscar)
+      return self.poseciones().contains(artefactoABuscar)
     }
-///------fin
-}
 
+    method poseciones() {
+     return artefactosRecolectados.union(hogar.artefactosRecolectados()) 
+    }
+
+    method tamañoMochila(_tamañoMochila){
+        tamañoMochila = _tamañoMochila
+    }
+
+    method poderDePelea() {
+        return poderBase 
+            + artefactosRecolectados.sum({artefactosRecolectados => artefactosRecolectados.poder()})
+    }
+ 
+}
+//-------------CASTILLO------------------
 object castilloDePiedras {
 
   const artefactosRecolectados = #{} 
@@ -55,22 +55,64 @@ object castilloDePiedras {
   method artefactosRecolectados() {
     return artefactosRecolectados
   }
+
+  method esconderArtefactos(artefactos) {
+    artefactosRecolectados.addAll(artefactos)
+    
+  }
+}
+
+//// ----------------------------ARTEFACTOS--------------------------------
+
+object espadaDelDestino {
+  const poder = 20 
+
+  method poder() {
+    return poder
+  }
 }
 
 
 
+object libroDeHechizos {
+  const poder = 20 
 
-object espadadeldestino {
-  
+  method poder() {
+    return poder
+  }
 }
 
-object librodehechizos {
-  
-}
+
+
 
 object collarDivino {
-  
+  var poder = 3 
+  var usosEnBatalla = 0
+
+  method usosEnBatallaPor(personaja) {
+    usosEnBatalla += 1
+  }
+
+  method poderQueAportaA(personaje) {
+    if (personaje. poderBase() > 6){
+            return poder + usosEnBatalla
+        } else {
+            return poder     
+    }
+  }
+
+  method poder() {
+    return poder
+  }
+
 }
-object armaduradeacero {
-  
+
+
+
+object armaduraDeAcero {
+  const poder = 20 
+
+  method poder() {
+    return poder
+  }
 }

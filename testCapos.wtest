@@ -1,0 +1,10 @@
+import capos.*
+describe "test" {
+    method initialize() {
+      rolando.recolectarArtefacto(espadaDelDestino)
+      rolando.recolectarArtefacto(libroDeHechizos)
+    }
+  test "description" {
+    assert.equals(2, rolando.artefactosRecolectados.size())
+  }
+}
