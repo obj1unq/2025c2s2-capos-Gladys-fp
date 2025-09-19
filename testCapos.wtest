@@ -1,0 +1,98 @@
+import capos.*
+describe "Rolando primera parte" {// "Rolando parte 1.1 y 1.2"{
+    method initialize() {
+      rolando.recolectarArtefacto(espadaDelDestino)
+      rolando.recolectarArtefacto(libroDeHechizos)
+    }
+    
+    test "Rolando recolectando artefactos"{
+        assert.throwsException({rolando.recolectarArtefacto(collarDivino)})
+        assert.equals(#{espadaDelDestino, libroDeHechizos}, rolando.artefactosRecolectados())
+    }
+
+    test "Rolando llega al castillo"{    
+        rolando.llegarAHogar()
+        rolando.recolectarArtefacto(collarDivino)
+        rolando.llegarAHogar()
+        assert.equals(#{espadaDelDestino, libroDeHechizos, collarDivino}, castilloDePiedras.artefactosRecolectados())
+        assert.equals(#{}, rolando.artefactosRecolectados())
+    }
+
+    test "Posesiones de Rolando"{
+        rolando.llegarAHogar()
+        rolando.recolectarArtefacto(armaduraDeAcero)
+        assert.equals(#{libroDeHechizos, espadaDelDestino, armaduraDeAcero}, rolando.poseciones())
+        assert.that(rolando.tieneEsteArtefacto(espadaDelDestino))
+    }
+
+    test "Historial de artefactos encontrados"{
+        assert.throwsException({rolando.recolectarArtefacto(collarDivino)})
+        rolando.llegarAHogar()
+        rolando.recolectarArtefacto(armaduraDeAcero)
+        rolando.recolectarArtefacto(collarDivino)
+        assert.equals([espadaDelDestino, libroDeHechizos, collarDivino, armaduraDeAcero, collarDivino], rolando.historialDeArtefactosEncontrados())
+    }
+}
+
+
+describe "Rolando segunga parte"{ 
+    method initialize(){
+        rolando.tamañoMochila(3)
+        rolando.recolectarArtefacto(espadaDelDestino)
+        rolando.recolectarArtefacto(armaduraDeAcero)
+        rolando.recolectarArtefacto(collarDivino)        
+    }
+
+    test "Rolando a Batallar"{
+        assert.equals(19, rolando.poderDePelea())
+
+        rolando.batallar()
+        assert.equals(6, rolando.poderBase())
+        assert.equals(3, espadaDelDestino.poderQueAportaA(rolando))
+        assert.equals(6, armaduraDeAcero.poderQueAportaA(rolando))
+        assert.equals(3, collarDivino.poderQueAportaA(rolando))
+        
+        rolando.batallar()
+        assert.equals(7, rolando.poderBase())
+        assert.equals(3.5, espadaDelDestino.poderQueAportaA(rolando))
+        assert.equals(6, armaduraDeAcero.poderQueAportaA(rolando))
+        assert.equals(5, collarDivino.poderQueAportaA(rolando))
+
+
+        rolando.batallar()
+        assert.equals(8, rolando.poderBase())
+        assert.equals(4, espadaDelDestino.poderQueAportaA(rolando))
+        assert.equals(6, armaduraDeAcero.poderQueAportaA(rolando))
+        assert.equals(6, collarDivino.poderQueAportaA(rolando))     
+    }
+
+    test "Libro de hechizos" {
+        rolando.llegarAHogar()
+        rolando.recolectarArtefacto(libroDeHechizos) 
+        assert.equals(4, libroDeHechizos.poderQueAportaA(rolando))
+        rolando.batallar()
+        assert.equals(6, libroDeHechizos.poderQueAportaA(rolando))
+        rolando.batallar()
+        assert.equals(7, libroDeHechizos.poderQueAportaA(rolando))
+        rolando.batallar()
+        assert.equals(0, libroDeHechizos.poderQueAportaA(rolando))
+    }
+
+    test "Enemigos de Rolando" {
+        assert.equals(#{astra, archibaldo}, rolando.personajesQuePuedeVencerEn(erethia))
+        assert.equals([torreDeMarfil, palacioDeMarmol], rolando.reinosAConquistarEn(erethia))
+        
+    }
+
+    test "Rolando es poderoso" { 
+        rolando.poderBase(10)
+        assert.that(rolando.esPoderosoEn(erethia))
+    }
+
+    test "artefacto fatal de rolando" {
+        rolando.poderBase(15)
+        assert.equals(espadaDelDestino, rolando.artefactoFatalPara(astra))
+        assert.equals(null, rolando.artefactoFatalPara(caterina))      
+    }
+
+}
