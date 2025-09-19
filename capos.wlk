@@ -1,100 +1,89 @@
+
 object rolando {
-    var tamañoMochila = 3
-    var poderBase = 5
-    const hogar = castilloDePiedras
-    const historialDeArtefactosEncontrados = [] 
-    const artefactosRecolectados = #{espadaDelDestino, collarDivino}
-    var libroDeHechizos = []
+  var tamañoMochila = 2
+  const  hogar = castilloDePiedras
+  var property poderBase = 5
+  const property historialDeArtefactosEncontrados = [] 
+  const property artefactosRecolectados = #{}
 
-    method poderBase(){
-      return poderBase
-    }
-
-    method artefactosRecolectadosPorRolando() {
-      return artefactosRecolectados
-    }    
-
-    method historialDeArtefactosEncontrados() {
-      return historialDeArtefactosEncontrados
-    }
-
-    method recolectarArtefacto(artefacto){
-        historialDeArtefactosEncontrados.add(artefacto) 
-        if(tamañoMochila > artefactosRecolectados.size()){      
-            artefactosRecolectados.add(artefacto)  
-        }
-    }
-
-    method esconderArtefactosEnHogar() {
-        hogar.esconderArtefactos(artefactosRecolectados)
-        artefactosRecolectados.clear()
-    }
-
-    method llegarAHogar() { //siempre que llega a su hogar guarda todos los artefactos que tiene.
-    self.esconderArtefactosEnHogar()
+  method tamañoMochila(_tamañoMochila){
+    tamañoMochila = _tamañoMochila
   }
 
-    method buscarArtefacto(artefactoABuscar) {
-      return self.poseciones().contains(artefactoABuscar)
+  method recolectarArtefacto(artefacto){
+    historialDeArtefactosEncontrados.add(artefacto) 
+    if( artefactosRecolectados.size() >= tamañoMochila){      
+         self.error("supera el maximo de artefactos en la mochila")
+    }else {
+      artefactosRecolectados.add(artefacto) 
     }
+  }
 
-    method poseciones() {
-     return artefactosRecolectados.union(hogar.artefactosRecolectados()) 
-    }
+  method esconderArtefactosEnhogar() {
+    hogar.esconderArtefactos(artefactosRecolectados)
+    artefactosRecolectados.clear()
+  }
 
-    method tamañoMochila(_tamañoMochila){
-        tamañoMochila = _tamañoMochila
-    }
+  method llegarAHogar() { 
+    self.esconderArtefactosEnhogar()
+  }
 
-    method poderDePelea() {
-        return poderBase 
-            + artefactosRecolectados.sum({artefacto => artefacto.poderQueAportaA(self)})
-    }
+  method tieneEsteArtefacto(artefacto) {
+    return self.poseciones().contains(artefacto)
+  }
 
-    method aumentarPoderBase() {
-      poderBase += 1
-      
-    }
+  method poseciones() {
+    return artefactosRecolectados.union(hogar.artefactosRecolectados()) 
+  }
 
-    method batallar() {
-      self.aumentarPoderBase()
-      artefactosRecolectados.forEach({artefacto => artefacto.pelearUnaBatalla()})
-      
-    }
+  method aumentarPoderBase() {
+    poderBase += 1  
+  }
+
+  method batallar() {
+    self.aumentarPoderBase()
+    artefactosRecolectados.forEach({artefacto => artefacto.aunmentarUsoEnBatalla()})
+  }
+
+  method poderDePelea() {
+    return poderBase+ artefactosRecolectados.sum({artefacto => artefacto.poderQueAportaA(self)})
+  }
 
   method artefactoMasPoderosoEnMorada(){
-    return hogar.artefactoMasPoderoso(self)
+    return hogar.poderDelArtefactoMasPoderoso(self)
   }
 
-}
-//---------------------HECHIZOS------------------------
-object bendicion {
-  method poderDePelea(personaje) {
-    return 4  
+  method puedeVencerA(enemigo) {
+    return self.poderDePelea() > enemigo.poderDePelea()
   }
 
-  
-}
-object invisibilidad {
-
-  method poderDePelea(personaje) {
-    return personaje.poderPelea()
+  method personajesQuePuedeVencerEn(tierra) {
+    return tierra.habitantesEnLaTierra().filter({ enemigo => self.puedeVencerA(enemigo) })
   }
 
-}
-
-object invocacion {
-  method poderDePelea(personaje) {
-    return personaje.artefactoMasPoderosoEnMorada()
+  method reinosAConquistarEn(tierra) {
+    return self.personajesQuePuedeVencerEn(tierra).map({ enemigo => enemigo.hogar()})           
   }
   
+  method esPoderosoEn (tierra){
+    return tierra.habitantesEnLaTierra().all({enemigo => self.puedeVencerA(enemigo)})
+  }
+
+  method esFatalContra(artefacto, enemigo) {
+    return artefacto.poderQueAportaA(self) > enemigo.poderDePelea()
+  } 
+
+  method artefactoFatalPara(enemigo) {
+    return artefactosRecolectados.findOrElse(
+      { artefacto => self.esFatalContra(artefacto, enemigo) }, { => null }
+    )
+  }
+
 }
 
 
-
-//-------------CASTILLO------------------
+//---------------------MORADAS------------------------
 object castilloDePiedras {
-
   const artefactosRecolectados = #{} 
 
   method artefactosRecolectados() {
@@ -103,94 +92,153 @@ object castilloDePiedras {
 
   method esconderArtefactos(artefactos) {
     artefactosRecolectados.addAll(artefactos)
-    
   }
 
-      method artefactoMasPoderoso(personaje){
-      return self.artefactosRecolectados().max({ artefacto => artefacto.poderQueAportaA(personaje)})
+  method poderDelArtefactoMasPoderoso(personaje){
+    return self.artefactosRecolectados()
+      .max({ artefacto => artefacto.poderQueAportaA(personaje)})
+      .poderQueAportaA(personaje)
     }
 }
-//espadaDelCastillo.usosEnBatalla()
-//
+
+object fortalezaDeAcero {}
+
+object palacioDeMarmol {}
+
+object torreDeMarfil {}
+
+
 //// ----------------------------ARTEFACTOS--------------------------------
 
+//ESPADA DEL DESTINO
 object espadaDelDestino {
-  const poder = 0
-  var usosEnBatalla = 0
+  const property poderDePelea = 0
+  var property usosEnBatalla = 0
 
-  method poder() {
-    return poder
-  }
 
-  method pelearUnaBatalla() {
+  method aunmentarUsoEnBatalla() {
     usosEnBatalla += 1
   }
-  method usosEnBatalla() {
-    return usosEnBatalla
-  }
+
   method poderQueAportaA(personaje) {
     if (usosEnBatalla == 0){
-            return personaje.poderBase() 
-        } else {
-            return personaje.poderBase() / 2     
+        return personaje.poderBase() 
+      } else {
+        return personaje.poderBase() / 2     
     }
   }
-
 }
 
-
+//------COLLAR DIVINO
 object collarDivino {
-  var poder = 3 
-  var usosEnBatalla = 0
+  const property poderDePelea = 3 
+  var property usosEnBatalla = 0
 
-  method poder() {
-    return poder
-  }
-
-  method usosEnBatalla() {
-    return usosEnBatalla
-  }
-
-  method pelearUnaBatalla() {
+  method aunmentarUsoEnBatalla() {
     usosEnBatalla += 1
-  
   }
 
   method poderQueAportaA(personaje) {
     if (personaje. poderBase() > 6){
-            return poder + usosEnBatalla
-        } else {
-            return poder     
+        return poderDePelea + usosEnBatalla
+      } else {
+        return poderDePelea     
     }
   }
-
-
-
 }
 
+
+// ARMADURA DE ACERO 
 object armaduraDeAcero {
-  const poder = 6
-  method pelearUnaBatalla(){}
+  const property poderDePelea = 6
+
+  method aunmentarUsoEnBatalla(){}
 
   method poderQueAportaA(personaje) {// PENDIENTE
-  return poder
+  return poderDePelea
   }
-
-
-
-
 }
 
 
+// LIBRO DE HECHIZOS
 object libroDeHechizos {
-  const poder = 20 
+  var hechizos = [bendicion, invisibilidad, invocacion]
+  method aunmentarUsoEnBatalla(){}
 
-  method pelearUnaBatalla(){}
-
-  method poderQueAportaA(personaje) { // PENDIENTE
-  return poder
+  method hechizos() {
+    return hechizos
   }
 
+  method poderQueAportaA(personaje) { 
+    if (hechizos.isEmpty()) {
+      return 0
+    }
+    var primerHechizo = hechizos.first()
+    hechizos = hechizos.drop(1) 
+    return primerHechizo.poderDePelea(personaje)
+  }
 }
 
 
+//---------------------HECHIZOS------------------------
+object bendicion {
+  method poderDePelea(personaje) {
+    return 4  
+  }
+}
+
+
+object invisibilidad {
+  method poderDePelea(personaje) {
+    return personaje.poderBase()
+  }
+}
+
+
+object invocacion {
+  method poderDePelea(personaje) {
+    return personaje.artefactoMasPoderosoEnMorada()
+  }
+}
+//------------------------- TIERRA DE ARETHIA --------------------------
+
+object erethia {
+  var property  habitantes = #{caterina, astra, archibaldo}
+
+  method habitantesEnLaTierra() {
+    return habitantes
+  }
+
+
+}
+
+//------------------------------ENEMIGOS--------------------------------
+
+object caterina {
+  const poderDePelea = 28
+  var property hogar = fortalezaDeAcero
+
+  method poderDePelea() {
+    return poderDePelea 
+  }  
+}
+
+
+object archibaldo {
+  const poderDePelea = 16
+  var property hogar = palacioDeMarmol
+
+  method poderDePelea() {
+    return poderDePelea 
+  }  
+}
+
+
+object astra {
+  const poderDePelea = 14
+  var property hogar = torreDeMarfil
+
+  method poderDePelea() {
+    return poderDePelea 
+  } 
+}
